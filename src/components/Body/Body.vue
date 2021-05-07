@@ -172,7 +172,7 @@
 <script>
 import SubHeader from './SubHeader'
 import Selector from './Selector'
-import users from '../../assets/users'
+import users from '../../assets/users.json'
 export default {
     components: {
         SubHeader,
@@ -233,10 +233,8 @@ export default {
         }
     },
     created() {
-        const { users } = this.users
-
-        this.usersForTable = Object.keys(users).reduce((acc, key) => {
-            const user = this.users.users[key]
+        this.usersForTable = Object.keys(this.users).reduce((acc, key) => {
+            const user = this.users[key]
             const { datos_paciente, ficha_dental } = user
             const { nombre, apellidos } = datos_paciente
             const { clinica, objetivo_tratamiento, estado } = ficha_dental
@@ -248,7 +246,7 @@ export default {
                 key
             })
             return acc
-            }, [])
+        }, [])
     }
 }
 </script>
