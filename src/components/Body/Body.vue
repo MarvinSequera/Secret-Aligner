@@ -71,6 +71,7 @@
                             color="#2D82D7"
                             class="py-6"
                             width="200"
+                            @click="createCSV"
                         >
                             <v-icon class="pr-2">mdi-file-download</v-icon>
                             <span class="text-subtitle-1">
@@ -113,7 +114,7 @@
                         @page-count="pageCount = $event"
                     >
                         <template #item.status="{ item }">
-                            <v-btn 
+                            <!-- <v-btn 
                                 rounded
                                 class="py-6 av-status"
                                 width="150"
@@ -121,7 +122,15 @@
                                 
                             >
                                 {{ item.status }}
-                            </v-btn>
+                            </v-btn> -->
+                            <v-chip
+                                class="av-status"
+                                text-color="white"
+                                large
+                                :color="statusColor(item.status)"
+                            >
+                                {{ item.status }}
+                            </v-chip>
                         </template>
                         <template #item.actions>
                             <Selector class="mt-4"/>
@@ -230,6 +239,14 @@ export default {
             if (status === 'enviado') return 'purple'
             if (status === 'planificando') return 'orange'
             else return 'red'
+        },
+        createCSV() {
+            const csvContent = this.usersFiltered.reduce((acc, user) => {
+                acc += `Name: ${user.name}, Traitement: ${user.traitement}, Clinic: ${user.clinic}, Status: ${user.status}\n`
+                return acc
+            }, 'data:text/csv;charset=utf-8,')
+            const encodedUri = encodeURI(csvContent);
+            window.open(encodedUri);
         }
     },
     created() {
@@ -266,6 +283,7 @@ export default {
     cursor: pointer;
 }
 .av-status {
-    color: white !important;
+    width: 120px;
+    justify-content: center;
 }
 </style>
