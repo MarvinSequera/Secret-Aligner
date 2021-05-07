@@ -113,6 +113,7 @@
                         hide-default-footer
                         class="elevation-1"
                         @page-count="pageCount = $event"
+                        @click:row="openDetailDialog"
                     >
                         <template #item.status="{ item }">
                             <v-chip
@@ -142,6 +143,7 @@
                             height="350"
                             width="320"
                             class="ma-8"
+                            @click="openDetailDialog(user)"
                         >
                             <v-card-title class="d-flex justify-center">
                                 <v-icon size="120">mdi-shield-account</v-icon>
@@ -178,6 +180,10 @@
         <NewPatient
             v-model="openDialog"
         />
+        <PatientDetail
+            v-model="openDetail"
+            :user="rowData"
+        />
     </v-container>
 </template>
 
@@ -185,13 +191,15 @@
 import SubHeader from './SubHeader'
 import Selector from './Selector'
 import NewPatient from './NewPatient'
+import PatientDetail from './PatientDetail'
 import users from '../../assets/users.json'
 
 export default {
     components: {
         SubHeader,
         Selector,
-        NewPatient
+        NewPatient,
+        PatientDetail
     },
     data: () => ({
         headers: [
@@ -212,7 +220,9 @@ export default {
         itemsPerPage : 5,
         page: 1,
         pageCount: 0,
-        openDialog: false
+        openDialog: false,
+        openDetail: false,
+        rowData: {}
     }),
     computed: {
         usersFiltered() {
@@ -272,6 +282,11 @@ export default {
         nextPage(page) {
             this.page = page
         },
+        openDetailDialog(row) {
+            const fullUser = this.users[row.key]
+            Object.assign(this.rowData, fullUser)
+            this.openDetail = true
+        }
     },
     created() {
         this.usersForTable = Object.keys(this.users).reduce((acc, key) => {
