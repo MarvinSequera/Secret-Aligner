@@ -60,6 +60,7 @@
                             color="#2D82D7"
                             class="py-6 mx-4"
                             width="200"
+                            @click="openDialog=true"
                         >
                             <v-icon class="pr-2">mdi-plus</v-icon>
                             <span class="text-subtitle-1">
@@ -114,15 +115,6 @@
                         @page-count="pageCount = $event"
                     >
                         <template #item.status="{ item }">
-                            <!-- <v-btn 
-                                rounded
-                                class="py-6 av-status"
-                                width="150"
-                                :color="statusColor(item.status)"
-                                
-                            >
-                                {{ item.status }}
-                            </v-btn> -->
                             <v-chip
                                 class="av-status"
                                 text-color="white"
@@ -183,17 +175,23 @@
                 </template>
             </v-col>
         </v-row>
+        <NewPatient
+            v-model="openDialog"
+        />
     </v-container>
 </template>
 
 <script>
 import SubHeader from './SubHeader'
 import Selector from './Selector'
+import NewPatient from './NewPatient'
 import users from '../../assets/users.json'
+
 export default {
     components: {
         SubHeader,
-        Selector
+        Selector,
+        NewPatient
     },
     data: () => ({
         headers: [
@@ -214,6 +212,7 @@ export default {
         itemsPerPage : 5,
         page: 1,
         pageCount: 0,
+        openDialog: false
     }),
     computed: {
         usersFiltered() {
