@@ -143,36 +143,44 @@
                         ></v-pagination>
                     </div>
                 </v-card>
-                <v-row v-else>
-
-                <v-card v-for="user in usersFiltered"
-                    :key="user.name"
-                    height="350"
-                    width="320"
-                    class="ma-8"
-                >
-                    <v-card-title class="d-flex justify-center">
-                        <v-icon size="120">mdi-shield-account</v-icon>
-                    </v-card-title>
-                    <v-card-subtitle class="mt-2 ml-2">
-                        <div>
-                            <span class="font-weight-bold">Nombre:</span> {{ user.name }}
-                        </div>
-                        <div>
-                            <span class="font-weight-bold">Clinica:</span> {{ user.clinic }}
-                        </div>
-                        <div>
-                            <span class="font-weight-bold">Objetivo Tratamiento:</span> {{ user.traitement }}
-                        </div>
-                        <div>
-                            <span class="font-weight-bold">Estado:</span> {{ user.status }}
-                        </div>
-                    </v-card-subtitle>
-                    <v-card-actions>
-                        <Selector/> 
-                    </v-card-actions>
-                </v-card>
-                </v-row>
+                <template v-else>
+                    <v-row>
+                        <v-card v-for="user in userPerPage"
+                            :key="user.name"
+                            height="350"
+                            width="320"
+                            class="ma-8"
+                        >
+                            <v-card-title class="d-flex justify-center">
+                                <v-icon size="120">mdi-shield-account</v-icon>
+                            </v-card-title>
+                            <v-card-subtitle class="mt-2 ml-2">
+                                <div>
+                                    <span class="font-weight-bold">Nombre:</span> {{ user.name }}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold">Clinica:</span> {{ user.clinic }}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold">Objetivo Tratamiento:</span> {{ user.traitement }}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold">Estado:</span> {{ user.status }}
+                                </div>
+                            </v-card-subtitle>
+                            <v-card-actions>
+                                <Selector/> 
+                            </v-card-actions>
+                        </v-card>
+                    </v-row>
+                    <div class="text-center">
+                        <v-pagination
+                            v-model="page"
+                            :length="numberOfPages"
+                            @input="nextPage"
+                        />
+                    </div>
+                </template>
             </v-col>
         </v-row>
     </v-container>
@@ -209,17 +217,31 @@ export default {
     }),
     computed: {
         usersFiltered() {
-            if (!this.searchByName) {
+            if (!this.searchByName.trim() ) {
                 return this.usersForTable
             }
 
-            const filtered = this.usersForTable.filter(user => user.name.search(this.searchByName) !== -1)
+            return this.usersForTable.filter(user => user.name.toLowerCase().search(this.searchByName.trim().toLowerCase()) !== -1)
+        },
+        numberOfPages() {
+            return Math.ceil(this.usersFiltered.length / this.itemsPerPage)
+        },
+        userPerPage() {
+            let start = 0
+            let end = this.itemsPerPage
+            
+            if (this.page > 1) {
+                start = this.itemsPerPage * (this.page -1)
+                end = this.itemsPerPage * this.page
+            }
+            
+            const users = this.usersFiltered.slice(start,end)
 
-            if (!this.showTable) {
-                return filtered.slice(0, this.itemsPerPage)
+            if (!users.length) {
+                this.nextPage(1)
             }
 
-            return filtered
+            return users
         },
     },
     methods: {
@@ -247,7 +269,10 @@ export default {
             }, 'data:text/csv;charset=utf-8,')
             const encodedUri = encodeURI(csvContent);
             window.open(encodedUri);
-        }
+        },
+        nextPage(page) {
+            this.page = page
+        },
     },
     created() {
         this.usersForTable = Object.keys(this.users).reduce((acc, key) => {
@@ -285,5 +310,8 @@ export default {
 .av-status {
     width: 120px;
     justify-content: center;
+}
+.av-pagination {
+    text-align: center;
 }
 </style>
